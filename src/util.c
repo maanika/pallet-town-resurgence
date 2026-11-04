@@ -1,7 +1,20 @@
 #include <unistd.h>
 #include <stdio.h>
 
-size_t utilClearScreen(void) {
-    const char *clear_screen_ansi = "\e[1;1H\e[2J";
-    return write(STDOUT_FILENO, clear_screen_ansi, sizeof(clear_screen_ansi));
+size_t utilClearScreen(void)
+{
+	const char *clear_screen_ansi = "\e[1;1H\e[2J";
+	return write(STDOUT_FILENO, clear_screen_ansi, sizeof(clear_screen_ansi));
+}
+
+int utilGetValidIntInput(const char *prompt, const int min, const int max)
+{
+	int input = 0;
+	int ret = 0;
+	do {
+		printf("%s", prompt);
+		ret = scanf("%d", &input);
+	} while (ret != 1 || input < min || input > max);
+
+	return input;
 }

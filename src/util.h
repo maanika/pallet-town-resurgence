@@ -3,4 +3,6 @@
 
 size_t utilClearScreen();
 
+int utilGetValidIntInput(const char *prompt, const int min, const int max);
+
 #endif

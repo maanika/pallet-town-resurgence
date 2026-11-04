@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "util.h"
+#include "game.h"
 
 #define WELCOME_MESSAGE                                                                            \
 	"Welcome to Pallet town, a quiet village in Kanto... or at least it used to be.\n"         \
@@ -20,8 +21,7 @@ int main(void)
 	}
 
 	char buffer[4096] = {0};
-	size_t bytes_read;
-
+	size_t bytes_read = 0;
 	while ((bytes_read = fread(buffer, 1, sizeof(buffer), file)) > 0) {
 		fwrite(buffer, 1, bytes_read, stdout);
 	}
@@ -29,6 +29,14 @@ int main(void)
 	fclose(file);
 
 	printf("\n%s\n", WELCOME_MESSAGE);
+
+	const int num_of_players = utilGetValidIntInput(
+		"Enter number of players (between 4 and 10 players)?\n", 4, 10);
+	(void)num_of_players;
+
+    Game *game = gameCreate(num_of_players);
+    gameStart(game);
+    gameEnd(game);
 
 	return 0;
 }
