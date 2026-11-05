@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "player.h"
+
 #define TEAM_ROCKET_GRUNTS 1
 
 typedef enum {
@@ -18,15 +20,31 @@ typedef struct {
 	int num_pokemon_stolen_this_round;
 	int num_pokemon_saved_this_round;
 	int pokemon_stolen_trainer_ids[TEAM_ROCKET_GRUNTS];
+	Player **players;
 } Game;
 
 static void gameInitRound(Game *game)
 {
-    assert(game != NULL);
+	assert(game != NULL);
 	game->num_pokemon_saved_this_round = 0;
 	game->num_pokemon_stolen_this_round = 0;
 	memset(game->pokemon_stolen_trainer_ids, -1, sizeof(game->pokemon_stolen_trainer_ids));
 	return;
+}
+
+static Player** gamePlayersCreate(const int num_players)
+{
+    Player** players = malloc(sizeof(Player) * num_players);
+    if (!players) {
+        exit(EXIT_FAILURE);
+    }
+    return players;
+}
+
+static void gamePlayersDestroy(Game *game)
+{
+    assert(game != NULL);
+    free(game->players);
 }
 
 Game *gameCreate(int num_players)
@@ -40,6 +58,7 @@ Game *gameCreate(int num_players)
 	game->num_trainers_left = num_players - TEAM_ROCKET_GRUNTS;
 	game->time_of_day = NIGHT;
 	gameInitRound(game);
+    game->players = gamePlayersCreate(num_players);
 
 	printf("Game created with %d players\n", num_players);
 	return game;
@@ -47,7 +66,7 @@ Game *gameCreate(int num_players)
 
 void gameStart(Game *game)
 {
-    assert(game != NULL);
+	assert(game != NULL);
 
 	while (1) {
 		printf("Game Start!\n");
@@ -59,7 +78,8 @@ void gameStart(Game *game)
 
 void gameEnd(Game *game)
 {
-    assert(game != NULL);
+	assert(game != NULL);
+    gamePlayersDestroy(game);
 	free(game);
 	printf("Game End\n");
 }
