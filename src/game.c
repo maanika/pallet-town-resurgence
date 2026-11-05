@@ -32,21 +32,6 @@ static void gameInitRound(Game *game)
 	return;
 }
 
-static Player** gamePlayersCreate(const int num_players)
-{
-    Player** players = malloc(sizeof(Player) * num_players);
-    if (!players) {
-        exit(EXIT_FAILURE);
-    }
-    return players;
-}
-
-static void gamePlayersDestroy(Game *game)
-{
-    assert(game != NULL);
-    free(game->players);
-}
-
 Game *gameCreate(int num_players)
 {
 	Game *game = malloc(sizeof(Game));
@@ -57,8 +42,15 @@ Game *gameCreate(int num_players)
 	game->num_team_rocket_grunts_left = TEAM_ROCKET_GRUNTS;
 	game->num_trainers_left = num_players - TEAM_ROCKET_GRUNTS;
 	game->time_of_day = NIGHT;
+
 	gameInitRound(game);
-    game->players = gamePlayersCreate(num_players);
+
+	// Allocate memory for the array of pointers (Player*)
+	Player **players = malloc(sizeof(Player *) * num_players);
+	if (!players) {
+		exit(EXIT_FAILURE);
+	}
+	game->players = players;
 
 	printf("Game created with %d players\n", num_players);
 	return game;
@@ -79,7 +71,7 @@ void gameStart(Game *game)
 void gameEnd(Game *game)
 {
 	assert(game != NULL);
-    gamePlayersDestroy(game);
+	free(game->players);
 	free(game);
 	printf("Game End\n");
 }
