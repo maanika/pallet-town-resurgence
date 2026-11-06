@@ -29,4 +29,6 @@ void playerBanVote(Player *player);
 
 const char *playerRoleToString(const Role role);
 
+void playerDeinit(Player *player);
+
 #endif

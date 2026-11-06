@@ -34,9 +34,9 @@ int main(void)
 		"Enter number of players (between 4 and 10 players)?\n", 4, 10);
 	(void)num_of_players;
 
-    Game *game = gameCreate(num_of_players);
-    gameStart(game);
-    gameEnd(game);
+	Game *game = gameCreate(num_of_players);
+	gameStart(game);
+	gameEnd(game);
 
 	return 0;
 }
