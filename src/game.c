@@ -16,7 +16,7 @@ typedef enum {
 
 struct Game {
 	int num_players;
-	int num_team_rocket_grunts_left;
+	int num_team_rocket_left;
 	int num_trainers_left;
 	TimeOfDay time_of_day;
 	int num_pokemon_stolen_this_round;
@@ -82,6 +82,37 @@ static void gameDestroyPlayers(Game *game)
 	free(game->players);
 }
 
+typedef enum {
+	GAME_WINNER_NONE,
+	GAME_WINNER_TEAM_ROCKET,
+	GAME_WINNER_TOWN_SAVED,
+} GameWinner;
+
+static GameWinner gameGetWinner(Game *game)
+{
+	if (game->num_team_rocket_left >= game->num_trainers_left) {
+		return GAME_WINNER_TEAM_ROCKET;
+	} else if (game->num_team_rocket_left == 0) {
+		return GAME_WINNER_TOWN_SAVED;
+	}
+	return GAME_WINNER_NONE;
+}
+
+void gameStart(Game *game)
+{
+	assert(game != NULL);
+
+	while (gameGetWinner(game) == GAME_WINNER_NONE) {
+		break;
+	}
+
+	printf("\n\n%s\n\n", gameGetWinner(game) == GAME_WINNER_TOWN_SAVED
+				     ? "Pallet Town is Saved :) !!!!"
+				     : "Team Rocket Wins :( ....");
+
+	return;
+}
+
 Game *gameCreate(int num_players)
 {
 	Game *game = malloc(sizeof(Game));
@@ -89,7 +120,7 @@ Game *gameCreate(int num_players)
 		exit(EXIT_FAILURE);
 	}
 	game->num_players = num_players;
-	game->num_team_rocket_grunts_left = TEAM_ROCKET_GRUNTS;
+	game->num_team_rocket_left = TEAM_ROCKET_GRUNTS;
 	game->num_trainers_left = num_players - TEAM_ROCKET_GRUNTS;
 	game->time_of_day = NIGHT;
 
@@ -97,21 +128,7 @@ Game *gameCreate(int num_players)
 
 	game->players = gameCreatePlayers(num_players);
 
-	printf("Game created with %d players\n", num_players);
-
 	return game;
-}
-
-void gameStart(Game *game)
-{
-	assert(game != NULL);
-
-	while (1) {
-		printf("Game Loop Start!\n");
-		break;
-	}
-
-	return;
 }
 
 void gameEnd(Game *game)
@@ -119,5 +136,4 @@ void gameEnd(Game *game)
 	assert(game != NULL);
 	gameDestroyPlayers(game);
 	free(game);
-	printf("Game End\n");
 }
