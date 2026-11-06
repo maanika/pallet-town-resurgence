@@ -19,6 +19,8 @@ typedef struct {
     PlayerPrivate *private_data;
 } Player;
 
+Player *playerCreate(const int player_id, const Role role);
+
 void playerReset(Player *player);
 
 bool playerPokemonStolen(const Player *player);

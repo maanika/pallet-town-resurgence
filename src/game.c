@@ -5,10 +5,6 @@
 
 #include "player.h"
 #include "game.h"
-#include "gym_leader.h"
-#include "trainer.h"
-#include "officer_jenny.h"
-#include "team_rocket.h"
 #include "util.h"
 
 #define TEAM_ROCKET_GRUNTS 1
@@ -38,31 +34,6 @@ static void gameInitRound(Game *game)
 	return;
 }
 
-static Player *gameCreatePlayer(const int player_id, const Role role)
-{
-	Player *player = NULL;
-	switch (role) {
-	case GYM_LEADER:
-		player = (Player *)gymLeaderCreate(player_id);
-		break;
-	case TEAM_ROCKET_GRUNT:
-		player = (Player *)teamRocketCreate(player_id);
-		break;
-	case TRAINER:
-		player = (Player *)trainerCreate(player_id);
-		break;
-	case OFFICER_JENNY:
-		player = (Player *)officerJennyCreate(player_id);
-		break;
-	case ROLE_COUNT:
-		// TODO: better error handling
-		assert(false); // should not be able to reach here
-		break;
-	}
-
-	return player;
-}
-
 static void gameInitPlayers(Player **players, const int num_players)
 {
 	// Initialse all roles as trainers
@@ -79,7 +50,7 @@ static void gameInitPlayers(Player **players, const int num_players)
 	utilShuffleArray(roles, num_players, sizeof(Role));
 
 	for (int i = 0; i < num_players; i++) {
-		players[i] = gameCreatePlayer(i, roles[i]);
+		players[i] = playerCreate(i, roles[i]);
 	}
 
 	for (int i = 0; i < num_players; i++) {
@@ -136,7 +107,7 @@ void gameStart(Game *game)
 	assert(game != NULL);
 
 	while (1) {
-		printf("Game Start!\n");
+		printf("Game Loop Start!\n");
 		break;
 	}
 
