@@ -1,8 +1,10 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 
 #include "player_private.h"
 #include "trainer.h"
+#include "util.h"
 
 Trainer *trainerCreate(const int player_id)
 {
@@ -14,3 +16,17 @@ Trainer *trainerCreate(const int player_id)
 	return trainer;
 }
 
+void trainerNightRound(Trainer *const trainer)
+{
+	printf("You are sleeping with your partner Pokemon\n");
+}
+
+void trainerDayRound(Trainer *const trainer)
+{
+	if (trainer->player.private_data->can_vote) {
+        // TODO: only alive players can be selected, using 1-10 for now
+		const int i = utilGetValidIntInput("Vote who the Team Rocket Grunt may be?", 1, 10);
+        (void)i;
+	}
+	return;
+}

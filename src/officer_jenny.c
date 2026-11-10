@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 
 #include "player.h"
@@ -15,3 +16,7 @@ OfficerJenny *officerJennyCreate(const int player_id)
 	return officer_jenny;
 }
 
+void officerJennyNightRound(OfficerJenny *const officer_jenny)
+{
+	printf("You are on patrol with your partner Pokemon\n");
+}

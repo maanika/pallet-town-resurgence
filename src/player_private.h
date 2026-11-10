@@ -3,9 +3,10 @@
 
 #include "player.h"
 
-struct PlayerPrivate{
+struct PlayerPrivate {
 	int pokemon_partner_stolen;
 	int can_vote;
+    bool is_alive;
 };
 
 void playerInit(Player *player, const int player_id, const Role role);

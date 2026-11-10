@@ -34,6 +34,7 @@ void playerInit(Player *player, const int player_id, const Role role)
 	player->private_data = playerPrivateCreate();
 	player->private_data->pokemon_partner_stolen = false;
 	player->private_data->can_vote = true;
+	player->private_data->is_alive = true;
 }
 
 void playerDeinit(Player *player)
@@ -62,6 +63,11 @@ bool playerCanVote(const Player *player)
 	return player->private_data->can_vote;
 }
 
+bool playerIsAlive(const Player *const player)
+{
+    return player->private_data->is_alive;
+}
+
 void playerBanVote(Player *player)
 {
 	assert(player != NULL);
@@ -85,6 +91,45 @@ const char *playerRoleToString(const Role role)
 	// should not reach here
 	assert(false);
 	return NULL;
+}
+
+void playerNightRound(Player *const player)
+{
+	switch (player->role) {
+	case TEAM_ROCKET_GRUNT:
+        return teamRocketNightRound((TeamRocket *)player);
+	case TRAINER:
+        return trainerNightRound((Trainer *)player);
+	case GYM_LEADER:
+		return gymLeaderNightRound((GymLeader *)player);
+	case OFFICER_JENNY:
+		return officerJennyNightRound((OfficerJenny *)player);
+	case ROLE_COUNT:
+		break;
+	}
+	// should not reach here
+	assert(false);
+	return;
+}
+
+// TODO: Duplication, can refactor with above function?
+void playerDayRound(Player *const player)
+{
+	switch (player->role) {
+	case TEAM_ROCKET_GRUNT:
+        return;
+	case TRAINER:
+        return;
+	case GYM_LEADER:
+		return;
+	case OFFICER_JENNY:
+		return;
+	case ROLE_COUNT:
+		break;
+	}
+	// should not reach here
+	assert(false);
+	return;
 }
 
 Player *playerCreate(const int player_id, const Role role)

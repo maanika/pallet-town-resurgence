@@ -4,10 +4,21 @@
 #include <string.h>
 #include <time.h>
 
-size_t utilClearScreen(void)
+void utilClearScreen(void)
 {
-	const char *clear_screen_ansi = "\e[1;1H\e[2J";
-	return write(STDOUT_FILENO, clear_screen_ansi, sizeof(clear_screen_ansi));
+    // \033[2J clears the entire screen
+    // \033[H moves the cursor to the top-left corner (1,1)
+    printf("\033[2J\033[H");
+    
+    // Flush stdout to ensure the changes apply immediately
+    fflush(stdout);
+}
+
+void utilPressEnterToContinue(const char *prompt)
+{
+	printf("%s\n", prompt);
+    char input = 0;
+    while ((input = getchar()) != '\n' && input != EOF);
 }
 
 int utilGetValidIntInput(const char *prompt, const int min, const int max)

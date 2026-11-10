@@ -10,9 +10,15 @@
 #define TEAM_ROCKET_GRUNTS 1
 
 typedef enum {
-	DAY,
-	NIGHT,
+	DAY_TIME,
+	NIGHT_TIME,
 } TimeOfDay;
+
+typedef enum {
+	GAME_WINNER_NONE,
+	GAME_WINNER_TEAM_ROCKET,
+	GAME_WINNER_TOWN_SAVED,
+} GameWinner;
 
 struct Game {
 	int num_players;
@@ -25,7 +31,7 @@ struct Game {
 	Player **players;
 };
 
-static void gameInitRound(Game *game)
+static void gameInitRound(Game *const game)
 {
 	assert(game != NULL);
 	game->num_pokemon_saved_this_round = 0;
@@ -74,7 +80,7 @@ static Player **gameCreatePlayers(const int num_players)
 	return players;
 }
 
-static void gameDestroyPlayers(Game *game)
+static void gameDestroyPlayers(Game *const game)
 {
 	for (int i = 0; i < game->num_players; i++) {
 		playerDeinit(game->players[i]);
@@ -82,13 +88,7 @@ static void gameDestroyPlayers(Game *game)
 	free(game->players);
 }
 
-typedef enum {
-	GAME_WINNER_NONE,
-	GAME_WINNER_TEAM_ROCKET,
-	GAME_WINNER_TOWN_SAVED,
-} GameWinner;
-
-static GameWinner gameGetWinner(Game *game)
+static GameWinner gameGetWinner(const Game *const game)
 {
 	if (game->num_team_rocket_left >= game->num_trainers_left) {
 		return GAME_WINNER_TEAM_ROCKET;
@@ -98,12 +98,57 @@ static GameWinner gameGetWinner(Game *game)
 	return GAME_WINNER_NONE;
 }
 
-void gameStart(Game *game)
+static void gameSetNextTimeOfDay(Game *const game)
+{
+	game->time_of_day = ((game->time_of_day) == NIGHT_TIME ? DAY_TIME : NIGHT_TIME);
+}
+
+static void gameNightRound(Game *const game)
+{
+	for (int i = 0; i < game->num_players; i++) {
+		if (!playerIsAlive(game->players[i])) {
+			continue;
+		}
+		printf("\n---------- It is Night Time! ----------\n\n");
+		printf("Player %d\n", i + 1);
+		utilPressEnterToContinue("Press ENTER when ready.");
+		printf("\nRole: %s\n", playerRoleToString(game->players[i]->role));
+		playerNightRound(game->players[i]);
+		utilPressEnterToContinue("Press ENTER to continue.");
+		utilClearScreen();
+	}
+}
+
+// TODO: Refactor with above function, very similar.
+static void gameDayRound(Game *const game)
+{
+	for (int i = 0; i < game->num_players; i++) {
+		printf("\n---------- It is Day Time! ----------\n\n");
+		printf("Player %d\n", i + 1);
+		utilPressEnterToContinue("Press ENTER when ready.");
+		printf("\nRole: %s\n", playerRoleToString(game->players[i]->role));
+		playerDayRound(game->players[i]);
+		utilPressEnterToContinue("Press ENTER to continue.");
+		utilClearScreen();
+	}
+}
+
+void gameStart(Game *const game)
 {
 	assert(game != NULL);
 
 	while (gameGetWinner(game) == GAME_WINNER_NONE) {
-		break;
+		utilPressEnterToContinue("Press ENTER to continue.");
+		utilClearScreen();
+
+		if (game->time_of_day == NIGHT_TIME) {
+			gameNightRound(game);
+
+		} else {
+			gameDayRound(game);
+		}
+
+		gameSetNextTimeOfDay(game);
 	}
 
 	printf("\n\n%s\n\n", gameGetWinner(game) == GAME_WINNER_TOWN_SAVED
@@ -113,7 +158,7 @@ void gameStart(Game *game)
 	return;
 }
 
-Game *gameCreate(int num_players)
+Game *gameCreate(const int num_players)
 {
 	Game *game = malloc(sizeof(Game));
 	if (!game) {
@@ -122,7 +167,7 @@ Game *gameCreate(int num_players)
 	game->num_players = num_players;
 	game->num_team_rocket_left = TEAM_ROCKET_GRUNTS;
 	game->num_trainers_left = num_players - TEAM_ROCKET_GRUNTS;
-	game->time_of_day = NIGHT;
+	game->time_of_day = NIGHT_TIME;
 
 	gameInitRound(game);
 
@@ -131,7 +176,7 @@ Game *gameCreate(int num_players)
 	return game;
 }
 
-void gameEnd(Game *game)
+void gameEnd(Game *const game)
 {
 	assert(game != NULL);
 	gameDestroyPlayers(game);

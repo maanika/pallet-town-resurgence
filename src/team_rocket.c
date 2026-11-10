@@ -4,6 +4,7 @@
 #include "player.h"
 #include "player_private.h"
 #include "team_rocket.h"
+#include "util.h"
 
 TeamRocket *teamRocketCreate(const int player_id)
 {
@@ -15,3 +16,9 @@ TeamRocket *teamRocketCreate(const int player_id)
 	return team_rocket;
 }
 
+void teamRocketNightRound(TeamRocket *const team_rocket)
+{
+	// TODO: only alive players can be selected, using 1-10 for now
+	const int i = utilGetValidIntInput("Select a player's Pokemon to steal over night?", 1, 10);
+    (void)i;
+}

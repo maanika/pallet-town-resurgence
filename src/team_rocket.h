@@ -9,4 +9,6 @@ typedef struct {
 
 TeamRocket *teamRocketCreate(const int player_id);
 
+void teamRocketNightRound(TeamRocket *const team_rocket);
+
 #endif

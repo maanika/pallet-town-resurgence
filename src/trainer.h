@@ -9,4 +9,6 @@ typedef struct {
 
 Trainer *trainerCreate(const int player_id);
 
+void trainerNightRound(Trainer *const trainer);
+
 #endif
