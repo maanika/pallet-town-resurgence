@@ -25,9 +25,11 @@ int utilGetValidIntInput(const char *prompt, const int min, const int max)
 {
 	int input = 0;
 	int ret = 0;
+    char c;
 	do {
 		printf("%s", prompt);
 		ret = scanf("%d", &input);
+        while ((c = getchar()) != '\n' && input != EOF);
 	} while (ret != 1 || input < min || input > max);
 
 	return input;

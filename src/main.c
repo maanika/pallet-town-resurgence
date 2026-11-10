@@ -5,14 +5,15 @@
 #include "game.h"
 
 #define WELCOME_MESSAGE                                                                            \
-	"Welcome to Pallet town, a quiet village in Kanto... or at least it used to be.\n"         \
+	"\nWelcome to Pallet town, a quiet village in Kanto... or at least it used to be.\n"         \
 	"Reports have surfaced that Team Rocket is operating in the area, hiding among innocent "  \
 	"trainers.\nEach night, they strike from the shadows, stealing our Pokemon. By "           \
 	"day, they walk among us.\nTrust your instincts and your Pokemon to uncover these Team "   \
-	"Rocket grunts.\nThe fate of the village depends on it!"
+	"Rocket grunts.\nThe fate of the village depends on it!\n\n"
 
 int main(void)
 {
+	utilClearScreen();
 
 	FILE *file = fopen("./images/town.ans", "rb");
 	if (file == NULL) {
