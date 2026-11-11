@@ -19,18 +19,13 @@ static PlayerPrivate *playerPrivateCreate(void)
 	return private_data;
 }
 
-static void playerPrivateDestroy(Player *player)
-{
-	assert(player != NULL);
-	free(player->private_data);
-}
-
 // Initialisatuin function -> i.e base class constructor
-void playerInit(Player *player, const int player_id, const Role role)
+void playerInit(Player *player, const int player_id, const Role role, const PlayerSkills *skills)
 {
 	assert(player != NULL);
 	player->player_id = player_id;
 	player->role = role;
+    player->skills = skills;
 	player->private_data = playerPrivateCreate();
 	player->private_data->pokemon_partner_stolen = false;
 	player->private_data->can_vote = true;
@@ -40,8 +35,8 @@ void playerInit(Player *player, const int player_id, const Role role)
 void playerDeinit(Player *player)
 {
 	assert(player != NULL);
-	playerPrivateDestroy(player);
-    free(player);
+	free(player->private_data);
+	free(player);
 }
 
 void playerReset(Player *player)
@@ -65,7 +60,7 @@ bool playerCanVote(const Player *player)
 
 bool playerIsAlive(const Player *const player)
 {
-    return player->private_data->is_alive;
+	return player->private_data->is_alive;
 }
 
 void playerBanVote(Player *player)
@@ -97,34 +92,13 @@ void playerNightRound(Player *const player)
 {
 	switch (player->role) {
 	case TEAM_ROCKET_GRUNT:
-        return teamRocketNightRound((TeamRocket *)player);
+		return teamRocketNightRound((TeamRocket *)player);
 	case TRAINER:
-        return trainerNightRound((Trainer *)player);
+		return trainerNightRound((Trainer *)player);
 	case GYM_LEADER:
 		return gymLeaderNightRound((GymLeader *)player);
 	case OFFICER_JENNY:
 		return officerJennyNightRound((OfficerJenny *)player);
-	case ROLE_COUNT:
-		break;
-	}
-	// should not reach here
-	assert(false);
-	return;
-}
-
-// TODO: Duplication, can refactor with above function?
-// Table of function pointers??? TODO
-void playerDayRound(Player *const player)
-{
-	switch (player->role) {
-	case TEAM_ROCKET_GRUNT:
-        return;
-	case TRAINER:
-        return;
-	case GYM_LEADER:
-		return;
-	case OFFICER_JENNY:
-		return;
 	case ROLE_COUNT:
 		break;
 	}
@@ -157,4 +131,3 @@ Player *playerCreate(const int player_id, const Role role)
 
 	return player;
 }
-

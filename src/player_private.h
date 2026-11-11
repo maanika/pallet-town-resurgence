@@ -6,9 +6,9 @@
 struct PlayerPrivate {
 	int pokemon_partner_stolen;
 	int can_vote;
-    bool is_alive;
+	bool is_alive;
 };
 
-void playerInit(Player *player, const int player_id, const Role role);
+void playerInit(Player *player, const int player_id, const Role role, const PlayerSkills *skills);
 
 #endif

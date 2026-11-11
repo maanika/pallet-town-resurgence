@@ -118,7 +118,8 @@ static void gamePrintPlayer(Player *const current_player, Player *const output_p
 
 static void gamePlayerTurn(Game *const game, Player *const current_player)
 {
-	printf("Player Role: %s\n", playerRoleToString(current_player->role));
+    // TODO: Show current player summary
+    current_player->skills->print_role(current_player);
 
 	if (current_player->role == TRAINER || current_player->role == GYM_LEADER) {
 		goto skip_print_players;
@@ -128,10 +129,12 @@ static void gamePlayerTurn(Game *const game, Player *const current_player)
 	printf("\nPlayers: \n");
 	for (int i = 0; i < game->num_players; i++) {
 		gamePrintPlayer(current_player, game->players[i]);
+
 	}
 	printf("\n");
 
 skip_print_players:
+    // Current player performs their special ability
 
 	playerNightRound(current_player);
 }
@@ -194,6 +197,7 @@ void gameStart(Game *const game)
 		}
 
 		gameSetNextTimeOfDay(game);
+        break;
 	}
 
 	printf("\n\n%s\n\n", gameGetWinner(game) == GAME_WINNER_TOWN_SAVED

@@ -13,11 +13,18 @@ typedef enum {
 
 typedef struct PlayerPrivate PlayerPrivate;
 
+typedef struct PlayerSkills PlayerSkills;
+
 typedef struct {
 	int player_id;
 	Role role;
-    PlayerPrivate *private_data;
+	PlayerPrivate *private_data;
+	const PlayerSkills *skills;
 } Player;
+
+struct PlayerSkills {
+	void (*print_role)(const Player *const player);
+};
 
 Player *playerCreate(const int player_id, const Role role);
 
