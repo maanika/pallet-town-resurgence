@@ -5,7 +5,7 @@
 #include "game.h"
 
 #define WELCOME_MESSAGE                                                                            \
-	"\nWelcome to Pallet town, a quiet village in Kanto... or at least it used to be.\n"         \
+	"\nWelcome to Pallet town, a quiet village in Kanto... or at least it used to be.\n"       \
 	"Reports have surfaced that Team Rocket is operating in the area, hiding among innocent "  \
 	"trainers.\nEach night, they strike from the shadows, stealing our Pokemon. By "           \
 	"day, they walk among us.\nTrust your instincts and your Pokemon to uncover these Team "   \
@@ -41,3 +41,32 @@ int main(void)
 
 	return 0;
 }
+
+// ** Notes **
+//
+// Game Rules:
+//  - Trainer
+//      Night:
+//          No special ability at Night.
+//      Day:
+//          Can vote who to battle during the day.
+//
+//  - Gym Leader
+//      Night:
+//          Can battle if targeted at Night.
+//          Wins the battle if move selcted by Team Rocket is less effective.
+//          Team Rocket gets away without any pokemon stolen if they loose.
+//      Day:
+//          Can vote who to battle during the day.
+//
+//  - Officer Jenny
+//      Night:
+//          Can select who to protect during the Night.
+//      Day:
+//          Can vote who to battle during the day
+//
+//  - Team Rocket
+//      Night:
+//          Selects which trainer to steal their Pokemon
+//      Day:
+//          Does nothing. No right to vote. Hide!
