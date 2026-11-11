@@ -4,6 +4,9 @@
 #include <string.h>
 
 #include "player.h"
+
+#include "team_rocket.h" //TODO: Need to clean this up using polymorphism??
+
 #include "game.h"
 #include "util.h"
 
@@ -59,11 +62,6 @@ static void gameInitPlayers(Player **players, const int num_players)
 		players[i] = playerCreate(i, roles[i]);
 	}
 
-	for (int i = 0; i < num_players; i++) {
-		printf("Player id %d, Role %s\n", players[i]->player_id,
-		       playerRoleToString(players[i]->role));
-	}
-
 	free(roles);
 }
 
@@ -103,34 +101,79 @@ static void gameSetNextTimeOfDay(Game *const game)
 	game->time_of_day = ((game->time_of_day) == NIGHT_TIME ? DAY_TIME : NIGHT_TIME);
 }
 
+static void gamePrintPlayer(Player *const current_player, Player *const output_player)
+{
+	// Output Player
+	if (!playerIsAlive(output_player)) {
+		return;
+	}
+	printf("* Player %d ", output_player->player_id + 1);
+	if (output_player->player_id == current_player->player_id) {
+		printf("[you] ");
+	}
+	if (output_player->role == TEAM_ROCKET_GRUNT) {
+		teamRocketPrint((TeamRocket *)current_player);
+	}
+}
+
+static void gamePlayerTurn(Game *const game, Player *const current_player)
+{
+	printf("Player Role: %s\n", playerRoleToString(current_player->role));
+
+	if (current_player->role == TRAINER || current_player->role == GYM_LEADER) {
+		goto skip_print_players;
+	}
+
+	// Print list of players alive
+	printf("\nPlayers: \n");
+	for (int i = 0; i < game->num_players; i++) {
+		gamePrintPlayer(current_player, game->players[i]);
+	}
+	printf("\n");
+
+skip_print_players:
+
+	playerNightRound(current_player);
+}
+
 static void gameNightRound(Game *const game)
 {
 	for (int i = 0; i < game->num_players; i++) {
 		if (!playerIsAlive(game->players[i])) {
 			continue;
 		}
+
 		printf("\n---------- It is Night Time! ----------\n\n");
 		printf("Player %d\n", i + 1);
+
 		utilPressEnterToContinue("Press ENTER when ready.");
-		printf("\nRole: %s\n", playerRoleToString(game->players[i]->role));
-		playerNightRound(game->players[i]);
+
+		gamePlayerTurn(game, game->players[i]);
+
 		utilPressEnterToContinue("Press ENTER to continue.");
 		utilClearScreen();
 	}
 }
 
-// TODO: Refactor with above function, very similar.
+static void gameShowNightRoundResults(Game *game)
+{
+	return;
+}
+
 static void gameDayRound(Game *const game)
 {
 	for (int i = 0; i < game->num_players; i++) {
 		printf("\n---------- It is Day Time! ----------\n\n");
 		printf("Player %d\n", i + 1);
 		utilPressEnterToContinue("Press ENTER when ready.");
-		printf("\nRole: %s\n", playerRoleToString(game->players[i]->role));
-		playerDayRound(game->players[i]);
 		utilPressEnterToContinue("Press ENTER to continue.");
 		utilClearScreen();
 	}
+}
+
+static void gameShowDayRoundResults(Game *game)
+{
+	return;
 }
 
 void gameStart(Game *const game)
@@ -143,9 +186,11 @@ void gameStart(Game *const game)
 
 		if (game->time_of_day == NIGHT_TIME) {
 			gameNightRound(game);
+			gameShowNightRoundResults(game);
 
 		} else {
 			gameDayRound(game);
+			gameShowDayRoundResults(game);
 		}
 
 		gameSetNextTimeOfDay(game);
@@ -154,7 +199,6 @@ void gameStart(Game *const game)
 	printf("\n\n%s\n\n", gameGetWinner(game) == GAME_WINNER_TOWN_SAVED
 				     ? "Pallet Town is Saved :) !!!!"
 				     : "Team Rocket Wins :( ....");
-
 	return;
 }
 

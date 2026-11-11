@@ -5,6 +5,7 @@
 #include "player.h"
 #include "player_private.h"
 #include "officer_jenny.h"
+#include "util.h"
 
 OfficerJenny *officerJennyCreate(const int player_id)
 {
@@ -18,5 +19,6 @@ OfficerJenny *officerJennyCreate(const int player_id)
 
 void officerJennyNightRound(OfficerJenny *const officer_jenny)
 {
-	printf("You are on patrol with your partner Pokemon\n");
+	const int i = utilGetValidIntInput("\nSelect a player's Pokemon to protect over night? ", 1, 10);
+    (void)i;
 }

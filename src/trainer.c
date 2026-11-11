@@ -18,7 +18,7 @@ Trainer *trainerCreate(const int player_id)
 
 void trainerNightRound(Trainer *const trainer)
 {
-	printf("You are sleeping with your partner Pokemon\n");
+	printf("\nYou are sleeping with your partner Pokemon\n\n");
 }
 
 void trainerDayRound(Trainer *const trainer)

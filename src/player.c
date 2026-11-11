@@ -113,6 +113,7 @@ void playerNightRound(Player *const player)
 }
 
 // TODO: Duplication, can refactor with above function?
+// Table of function pointers??? TODO
 void playerDayRound(Player *const player)
 {
 	switch (player->role) {

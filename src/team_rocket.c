@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
 
 #include "player.h"
 #include "player_private.h"
@@ -19,6 +20,11 @@ TeamRocket *teamRocketCreate(const int player_id)
 void teamRocketNightRound(TeamRocket *const team_rocket)
 {
 	// TODO: only alive players can be selected, using 1-10 for now
-	const int i = utilGetValidIntInput("Select a player's Pokemon to steal over night?", 1, 10);
+	const int i = utilGetValidIntInput("Select a player's Pokemon to steal over night? ", 1, 10);
     (void)i;
+}
+
+void teamRocketPrint(TeamRocket *const team_rocket)
+{
+    printf(" [team rocket] ");
 }
