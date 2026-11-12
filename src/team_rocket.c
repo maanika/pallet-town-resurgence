@@ -9,20 +9,23 @@
 
 static void teamRocketPrintRole(const Player *const player)
 {
-    printf("Role: Team Rocket\n");
+    assert(player != NULL);
+
+	playerShowDefaultSummary(player);
+	printf("\nYou are plotting to steal a trainer's Pokemon\n");
 }
+
+// static void teamRocketSepcialAbility(TeamRocket *const team_rocket)
+// {
+// 	// TODO: only alive players can be selected, using 1-10 for now
+// 	const int i =
+// 		utilGetValidIntInput("Select a player's Pokemon to steal over night? ", 1, 10);
+// 	(void)i;
+// }
 
 static const PlayerSkills team_rocket_skills = {
-    .print_role = teamRocketPrintRole,
+	.show_summary = teamRocketPrintRole,
 };
-
-void teamRocketNightRound(TeamRocket *const team_rocket)
-{
-	// TODO: only alive players can be selected, using 1-10 for now
-	const int i =
-		utilGetValidIntInput("Select a player's Pokemon to steal over night? ", 1, 10);
-	(void)i;
-}
 
 void teamRocketPrint(TeamRocket *const team_rocket)
 {

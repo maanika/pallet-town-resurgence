@@ -23,7 +23,7 @@ typedef struct {
 } Player;
 
 struct PlayerSkills {
-	void (*print_role)(const Player *const player);
+	void (*show_summary)(const Player *const player);
 };
 
 Player *playerCreate(const int player_id, const Role role);
@@ -45,5 +45,7 @@ void playerDeinit(Player *player);
 void playerNightRound(Player *const player);
 
 void playerDayRound(Player *const player);
+
+void playerShowDefaultSummary(const Player *const player);
 
 #endif

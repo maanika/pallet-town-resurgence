@@ -6,19 +6,23 @@
 #include "player_private.h"
 #include "gym_leader.h"
 
-static void gymLeaderPrintRole(const Player *const player)
+static void gymLeaderShowSummary(const Player *const player)
 {
-	printf("Role: Gym Leader\n");
+    assert(player != NULL);
+
+    playerShowDefaultSummary(player);
+	printf("\nYou are sleeping while your partner Pokemon is on guard\n");
 }
+
+// static void gymLeaderSecialAbility(GymLeader *const gym_leader)
+// {
+//     // can survive if Pokemon partner is stronger that team rockets Pokemon
+//     return;
+// }
 
 static const PlayerSkills gym_leader_skills = {
-    .print_role = gymLeaderPrintRole,
+    .show_summary = gymLeaderShowSummary,
 };
-
-void gymLeaderNightRound(GymLeader *const gym_leader)
-{
-	printf("\nYou are sleeping while your partner Pokemon on guard\n");
-}
 
 GymLeader *gymLeaderCreate(const int player_id)
 {

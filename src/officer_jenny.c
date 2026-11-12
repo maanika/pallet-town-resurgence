@@ -9,19 +9,22 @@
 
 static void officerJennyPrintRole(const Player *const player)
 {
-	printf("Role: Officer Jenny\n");
+    assert(player != NULL);
+
+    playerShowDefaultSummary(player);
+	printf("\nYou are on patrol with your partner Pokemon\n");
 }
+
+// static void officerJennySpecialAbility(OfficerJenny *const officer_jenny)
+// {
+// 	const int i =
+// 		utilGetValidIntInput("\nSelect a player's Pokemon to protect over night? ", 1, 10);
+// 	(void)i;
+// }
 
 static const PlayerSkills officer_jenny_skills = {
-    .print_role = officerJennyPrintRole,
+	.show_summary = officerJennyPrintRole,
 };
-
-void officerJennyNightRound(OfficerJenny *const officer_jenny)
-{
-	const int i =
-		utilGetValidIntInput("\nSelect a player's Pokemon to protect over night? ", 1, 10);
-	(void)i;
-}
 
 OfficerJenny *officerJennyCreate(const int player_id)
 {

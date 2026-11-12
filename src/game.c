@@ -4,9 +4,7 @@
 #include <string.h>
 
 #include "player.h"
-
-#include "team_rocket.h" //TODO: Need to clean this up using polymorphism??
-
+#include "team_rocket.h"
 #include "game.h"
 #include "util.h"
 
@@ -107,36 +105,35 @@ static void gamePrintPlayer(Player *const current_player, Player *const output_p
 	if (!playerIsAlive(output_player)) {
 		return;
 	}
-	printf("* Player %d ", output_player->player_id + 1);
+	printf("\n* Player %d ", output_player->player_id + 1);
 	if (output_player->player_id == current_player->player_id) {
 		printf("[you] ");
 	}
-	if (output_player->role == TEAM_ROCKET_GRUNT) {
+	// Expose team rocket grunts only to other team rocket grunts
+	if ((current_player->role == TEAM_ROCKET_GRUNT) &&
+	    (output_player->role == TEAM_ROCKET_GRUNT)) {
 		teamRocketPrint((TeamRocket *)current_player);
 	}
 }
 
 static void gamePlayerTurn(Game *const game, Player *const current_player)
 {
-    // TODO: Show current player summary
-    current_player->skills->print_role(current_player);
+	current_player->skills->show_summary(current_player);
 
 	if (current_player->role == TRAINER || current_player->role == GYM_LEADER) {
 		goto skip_print_players;
 	}
 
 	// Print list of players alive
-	printf("\nPlayers: \n");
+	printf("\nPlayers:");
 	for (int i = 0; i < game->num_players; i++) {
 		gamePrintPlayer(current_player, game->players[i]);
-
 	}
-	printf("\n");
+	printf("\n\n");
 
 skip_print_players:
-    // Current player performs their special ability
 
-	playerNightRound(current_player);
+	return;
 }
 
 static void gameNightRound(Game *const game)
@@ -197,7 +194,6 @@ void gameStart(Game *const game)
 		}
 
 		gameSetNextTimeOfDay(game);
-        break;
 	}
 
 	printf("\n\n%s\n\n", gameGetWinner(game) == GAME_WINNER_TOWN_SAVED

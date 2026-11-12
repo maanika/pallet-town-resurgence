@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <string.h>
+#include <stdio.h>
 
 #include "player.h"
 #include "player_private.h"
@@ -88,23 +88,11 @@ const char *playerRoleToString(const Role role)
 	return NULL;
 }
 
-void playerNightRound(Player *const player)
+void playerShowDefaultSummary(const Player *const player)
 {
-	switch (player->role) {
-	case TEAM_ROCKET_GRUNT:
-		return teamRocketNightRound((TeamRocket *)player);
-	case TRAINER:
-		return trainerNightRound((Trainer *)player);
-	case GYM_LEADER:
-		return gymLeaderNightRound((GymLeader *)player);
-	case OFFICER_JENNY:
-		return officerJennyNightRound((OfficerJenny *)player);
-	case ROLE_COUNT:
-		break;
-	}
-	// should not reach here
-	assert(false);
-	return;
+    assert(player != NULL);
+    printf("\nRole: %s\n", playerRoleToString(player->role));
+    // TODO :ASCII art / Graphics here
 }
 
 Player *playerCreate(const int player_id, const Role role)

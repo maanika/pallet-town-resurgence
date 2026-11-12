@@ -10,6 +10,4 @@ typedef struct {
 
 GymLeader *gymLeaderCreate(const int player_id);
 
-void gymLeaderNightRound(GymLeader *const gym_leader);
-
 #endif

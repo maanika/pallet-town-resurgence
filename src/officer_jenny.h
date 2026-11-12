@@ -9,6 +9,4 @@ typedef struct {
 
 OfficerJenny *officerJennyCreate(const int player_id);
 
-void officerJennyNightRound(OfficerJenny *const officer_jenny);
-
 #endif

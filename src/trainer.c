@@ -2,22 +2,27 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include "player.h"
 #include "player_private.h"
 #include "trainer.h"
 
 static void trainerPrintRole(const Player *const player)
 {
-	printf("Role: Trainer\n");
+    assert(player != NULL);
+
+    playerShowDefaultSummary(player);
+	printf("\nYou are fast asleep with your partner Pokemon\n");
 }
+
+// static void trainerSpecialAbility(Trainer *const trainer)
+// {
+//     // none
+//     return;
+// }
 
 static const PlayerSkills trainer_skills = {
-    .print_role = trainerPrintRole,
+    .show_summary = trainerPrintRole,
 };
-
-void trainerNightRound(Trainer *const trainer)
-{
-	printf("\nYou are sleeping with your partner Pokemon\n\n");
-}
 
 Trainer *trainerCreate(const int player_id)
 {

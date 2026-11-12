@@ -21,6 +21,8 @@ int main(void)
 		return 1;
 	}
 
+    // TODO: need a better way to display graphics on the terminal
+    // TODO: make graphics feel more profesisonal
 	char buffer[4096] = {0};
 	size_t bytes_read = 0;
 	while ((bytes_read = fread(buffer, 1, sizeof(buffer), file)) > 0) {
