@@ -20,9 +20,7 @@ static Event gymLeaderSecialAbility(const Player *const self, const Player *cons
 	(void)target; // because the gym leader protect themseleves
 	assert(self != NULL);
 
-	// TODO: protect if and only if the partner pokemon is stronger that the Team rocket pokeom
-
-	Action action = ACTION_PROTECT_POKEMON;
+	const Action action = ((rand() % 2) == 1) ? ACTION_PROTECT_POKEMON : ACTION_NONE;
 
 	const Event event = {.action = action, .targetd_player_id = self->player_id};
 	return event;

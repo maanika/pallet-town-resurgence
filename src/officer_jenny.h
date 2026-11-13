@@ -5,6 +5,7 @@
 
 typedef struct {
 	Player player;
+    int previous_protected_player_id;
 } OfficerJenny;
 
 OfficerJenny *officerJennyCreate(const int player_id);
