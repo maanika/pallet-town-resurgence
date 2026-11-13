@@ -65,10 +65,10 @@ bool playerIsEliminated(const Player *const player)
 	return player->private_data->is_elimiated;
 }
 
-void playerBanVote(Player *player)
+void playerEliminate(Player *player)
 {
-	assert(player != NULL);
-	player->private_data->can_vote = false;
+    player->private_data->is_elimiated = true;
+
 }
 
 const char *playerRoleToString(const Role role)

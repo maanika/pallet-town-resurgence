@@ -37,9 +37,9 @@ bool playerPokemonStolen(const Player *player);
 
 bool playerIsEliminated(const Player *const player);
 
-bool playerCanVote(const Player *player);
+void playerEliminate(Player *player);
 
-void playerBanVote(Player *player);
+bool playerCanVote(const Player *player);
 
 const char *playerRoleToString(const Role role);
 

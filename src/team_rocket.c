@@ -19,7 +19,19 @@ static void teamRocketPrintRole(const Player *const player)
 
 static Event teamRocketSepcialAbility(const Player *const self, const Player *const target_player)
 {
-	const Event event = {.action = ACTION_STEAL_POKEMON, .targetd_player_id = target_player->player_id};
+    Action action = ACTION_INVALID;
+
+	if (target_player->player_id == self->player_id) {
+		printf("\nYou cannot steal your own Pokemon, poor thing! :(\n");
+
+	} else if (playerIsEliminated(target_player)) {
+		printf("\nYou already stole their Pokemon -.-\n");
+
+	} else {
+		action = ACTION_STEAL_POKEMON;
+	}
+
+	const Event event = {.action = action, .targetd_player_id = target_player->player_id};
 	return event;
 }
 

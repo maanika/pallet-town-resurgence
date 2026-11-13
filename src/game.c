@@ -129,7 +129,33 @@ static void gameHandleEvent(Game *const game, const Event event)
 	case ACTION_PROTECT_POKEMON:
 		game->pokemon_protected_trainer_ids_flag |= (1U << (event.targetd_player_id));
 		break;
+	case ACTION_INVALID:
+		assert(false); // this cannot happen
+		break;
 	}
+}
+
+static void gameShowNightRoundResults(Game *game)
+{
+	assert(game != NULL);
+
+	uint8_t pokemon_stolen =
+		game->pokemon_stolen_trainer_ids_flag & ~(game->pokemon_protected_trainer_ids_flag);
+
+	if (pokemon_stolen == 0) {
+		printf("\nNo Pokemon were stolen tonight! :)\n");
+		return;
+	}
+
+	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		if (pokemon_stolen & (1U << i)) {
+			printf("\nPlayer %d had their partner Pokemon stolen :(\n", i + 1);
+			game->num_trainers_left--;
+			playerEliminate(game->players[i]);
+		}
+	}
+
+	return;
 }
 
 static void gamePlayerTurn(Game *const game, Player *const current_player)
@@ -143,21 +169,27 @@ static void gamePlayerTurn(Game *const game, Player *const current_player)
 		return;
 	}
 
-    int target_id = 1;
+	int target_id = 1;
 
 	if (current_player->role != GYM_LEADER) {
-		// Print list of players alive
 		printf("\nPlayers:");
 		for (int i = 0; i < game->num_players; i++) {
 			gamePrintPlayer(current_player, game->players[i]);
 		}
 		printf("\n\n");
-
-	    target_id = utilGetValidIntInput("\nEnter target's id? ", 1, game->num_players);
 	}
 
-	const Event event = current_player->skills->speical_ability(current_player,
-								    game->players[target_id - 1]);
+	Event event;
+	eventSetDefault(&event);
+
+	do {
+		if (current_player->role != GYM_LEADER) {
+			target_id =
+				utilGetValidIntInput("\nEnter target's id? ", 1, game->num_players);
+		}
+		event = current_player->skills->speical_ability(current_player,
+								game->players[target_id - 1]);
+	} while (event.action == ACTION_INVALID);
 
 	gameHandleEvent(game, event);
 
@@ -185,39 +217,17 @@ static void gameNightRound(Game *const game)
 
 static void gameResetRound(Game *game)
 {
-    assert(game != NULL);
+	assert(game != NULL);
 	game->pokemon_protected_trainer_ids_flag = 0;
 	game->pokemon_stolen_trainer_ids_flag = 0;
-}
-
-static void gameShowNightRoundResults(Game *game)
-{
-	assert(game != NULL);
-
-	printf("\n Night Time Results : stolen %d : protected : %d\n",
-	       game->pokemon_stolen_trainer_ids_flag, game->pokemon_protected_trainer_ids_flag);
-
-	uint8_t pokemon_stolen =
-		game->pokemon_stolen_trainer_ids_flag & ~(game->pokemon_protected_trainer_ids_flag);
-
-	if (pokemon_stolen == 0) {
-		printf("\nNo Pokemon were stolen tonight! :)\n");
-		return;
-	}
-
-	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
-		if (pokemon_stolen & (1U << i)) {
-			printf("\nPlayer %d had their partner Pokemon stolen :(\n", i + 1);
-			game->num_trainers_left--;
-		}
-	}
-
-	return;
 }
 
 static void gameDayRound(Game *const game)
 {
 	for (int i = 0; i < game->num_players; i++) {
+		if (playerIsEliminated(game->players[i])) {
+			continue;
+		}
 		printf("\n---------- It is Day Time! ----------\n\n");
 		printf("Player %d\n", i + 1);
 		utilPressEnterToContinue("Press ENTER when ready.");
@@ -248,7 +258,7 @@ void gameStart(Game *const game)
 			gameShowDayRoundResults(game);
 		}
 
-        gameResetRound(game);
+		gameResetRound(game);
 		gameSetNextTimeOfDay(game);
 	}
 

@@ -17,8 +17,7 @@ static void trainerPrintRole(const Player *const player)
 
 static Event trainerSpecialAbility(const Player *const self, const Player *const target_player)
 {
-    Event event;
-    eventSetDefault(&event);
+    const Event event = {.action = ACTION_NONE, .targetd_player_id = -1};
     return event;
 }
 

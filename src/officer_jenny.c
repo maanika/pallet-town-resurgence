@@ -6,7 +6,6 @@
 #include "player.h"
 #include "player_private.h"
 #include "officer_jenny.h"
-#include "util.h"
 
 static void officerJennyPrintRole(const Player *const player)
 {
@@ -19,7 +18,19 @@ static void officerJennyPrintRole(const Player *const player)
 
 static Event officerJennySpecialAbility(const Player *const self, const Player *const target_player)
 {
-	const Event event = {.action = ACTION_PROTECT_POKEMON, .targetd_player_id = target_player->player_id};
+	Action action = ACTION_INVALID;
+
+	if (target_player->player_id == self->player_id) {
+		printf("\nYou cannot protect yourself :p\n");
+
+	} else if (playerIsEliminated(target_player)) {
+		printf("\nSelected player has already had their partner Pokemon stolen\n");
+
+	} else {
+		action = ACTION_PROTECT_POKEMON;
+	}
+
+	const Event event = {.action = action, .targetd_player_id = target_player->player_id};
 	return event;
 }
 
