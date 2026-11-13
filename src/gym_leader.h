@@ -5,7 +5,6 @@
 
 typedef struct {
 	Player player;
-    int player_id_protect;
 } GymLeader;
 
 GymLeader *gymLeaderCreate(const int player_id);

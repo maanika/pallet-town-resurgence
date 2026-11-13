@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include "event.h"
 #include "player.h"
 #include "player_private.h"
 #include "officer_jenny.h"
@@ -9,21 +10,22 @@
 
 static void officerJennyPrintRole(const Player *const player)
 {
-    assert(player != NULL);
+	assert(player != NULL);
 
-    playerShowDefaultSummary(player);
-	printf("\nYou are on patrol with your partner Pokemon\n");
+	playerShowDefaultSummary(player);
+	printf("\nYou are on patrol with your partner Pokemon\n"
+	       "\nSelect a trainer's Pokemon to protect over night?\n");
 }
 
-// static void officerJennySpecialAbility(OfficerJenny *const officer_jenny)
-// {
-// 	const int i =
-// 		utilGetValidIntInput("\nSelect a player's Pokemon to protect over night? ", 1, 10);
-// 	(void)i;
-// }
+static Event officerJennySpecialAbility(const Player *const self, const Player *const target_player)
+{
+	const Event event = {.action = ACTION_PROTECT_POKEMON, .targetd_player_id = target_player->player_id};
+	return event;
+}
 
 static const PlayerSkills officer_jenny_skills = {
 	.show_summary = officerJennyPrintRole,
+	.speical_ability = officerJennySpecialAbility,
 };
 
 OfficerJenny *officerJennyCreate(const int player_id)

@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
+#include "event.h"
 #include "player.h"
 #include "team_rocket.h"
 #include "game.h"
@@ -26,18 +28,16 @@ struct Game {
 	int num_team_rocket_left;
 	int num_trainers_left;
 	TimeOfDay time_of_day;
-	int num_pokemon_stolen_this_round;
-	int num_pokemon_saved_this_round;
-	int pokemon_stolen_trainer_ids[TEAM_ROCKET_GRUNTS];
+	uint8_t pokemon_protected_trainer_ids_flag;
+	uint8_t pokemon_stolen_trainer_ids_flag;
 	Player **players;
 };
 
 static void gameInitRound(Game *const game)
 {
 	assert(game != NULL);
-	game->num_pokemon_saved_this_round = 0;
-	game->num_pokemon_stolen_this_round = 0;
-	memset(game->pokemon_stolen_trainer_ids, -1, sizeof(game->pokemon_stolen_trainer_ids));
+	game->pokemon_protected_trainer_ids_flag = 0;
+	game->pokemon_stolen_trainer_ids_flag = 0;
 	return;
 }
 
@@ -102,7 +102,7 @@ static void gameSetNextTimeOfDay(Game *const game)
 static void gamePrintPlayer(Player *const current_player, Player *const output_player)
 {
 	// Output Player
-	if (!playerIsAlive(output_player)) {
+	if (playerIsEliminated(output_player)) {
 		return;
 	}
 	printf("\n* Player %d ", output_player->player_id + 1);
@@ -116,22 +116,50 @@ static void gamePrintPlayer(Player *const current_player, Player *const output_p
 	}
 }
 
+static void gameHandleEvent(Game *const game, const Event event)
+{
+	assert(game != NULL);
+
+	switch (event.action) {
+	case ACTION_NONE:
+		break;
+	case ACTION_STEAL_POKEMON:
+		game->pokemon_stolen_trainer_ids_flag |= (1U << (event.targetd_player_id));
+		break;
+	case ACTION_PROTECT_POKEMON:
+		game->pokemon_protected_trainer_ids_flag |= (1U << (event.targetd_player_id));
+		break;
+	}
+}
+
 static void gamePlayerTurn(Game *const game, Player *const current_player)
 {
+	assert(game != NULL);
+	assert(current_player != NULL);
+
 	current_player->skills->show_summary(current_player);
 
-	if (current_player->role == TRAINER || current_player->role == GYM_LEADER) {
-		goto skip_print_players;
+	if (current_player->role == TRAINER) {
+		return;
 	}
 
-	// Print list of players alive
-	printf("\nPlayers:");
-	for (int i = 0; i < game->num_players; i++) {
-		gamePrintPlayer(current_player, game->players[i]);
-	}
-	printf("\n\n");
+    int target_id = 1;
 
-skip_print_players:
+	if (current_player->role != GYM_LEADER) {
+		// Print list of players alive
+		printf("\nPlayers:");
+		for (int i = 0; i < game->num_players; i++) {
+			gamePrintPlayer(current_player, game->players[i]);
+		}
+		printf("\n\n");
+
+	    target_id = utilGetValidIntInput("\nEnter target's id? ", 1, game->num_players);
+	}
+
+	const Event event = current_player->skills->speical_ability(current_player,
+								    game->players[target_id - 1]);
+
+	gameHandleEvent(game, event);
 
 	return;
 }
@@ -139,7 +167,7 @@ skip_print_players:
 static void gameNightRound(Game *const game)
 {
 	for (int i = 0; i < game->num_players; i++) {
-		if (!playerIsAlive(game->players[i])) {
+		if (playerIsEliminated(game->players[i])) {
 			continue;
 		}
 
@@ -155,8 +183,35 @@ static void gameNightRound(Game *const game)
 	}
 }
 
+static void gameResetRound(Game *game)
+{
+    assert(game != NULL);
+	game->pokemon_protected_trainer_ids_flag = 0;
+	game->pokemon_stolen_trainer_ids_flag = 0;
+}
+
 static void gameShowNightRoundResults(Game *game)
 {
+	assert(game != NULL);
+
+	printf("\n Night Time Results : stolen %d : protected : %d\n",
+	       game->pokemon_stolen_trainer_ids_flag, game->pokemon_protected_trainer_ids_flag);
+
+	uint8_t pokemon_stolen =
+		game->pokemon_stolen_trainer_ids_flag & ~(game->pokemon_protected_trainer_ids_flag);
+
+	if (pokemon_stolen == 0) {
+		printf("\nNo Pokemon were stolen tonight! :)\n");
+		return;
+	}
+
+	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		if (pokemon_stolen & (1U << i)) {
+			printf("\nPlayer %d had their partner Pokemon stolen :(\n", i + 1);
+			game->num_trainers_left--;
+		}
+	}
+
 	return;
 }
 
@@ -193,6 +248,7 @@ void gameStart(Game *const game)
 			gameShowDayRoundResults(game);
 		}
 
+        gameResetRound(game);
 		gameSetNextTimeOfDay(game);
 	}
 

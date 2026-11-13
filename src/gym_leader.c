@@ -5,23 +5,32 @@
 #include "player.h"
 #include "player_private.h"
 #include "gym_leader.h"
+#include "event.h"
 
 static void gymLeaderShowSummary(const Player *const player)
 {
-    assert(player != NULL);
+	assert(player != NULL);
 
-    playerShowDefaultSummary(player);
+	playerShowDefaultSummary(player);
 	printf("\nYou are sleeping while your partner Pokemon is on guard\n");
 }
 
-// static void gymLeaderSecialAbility(GymLeader *const gym_leader)
-// {
-//     // can survive if Pokemon partner is stronger that team rockets Pokemon
-//     return;
-// }
+static Event gymLeaderSecialAbility(const Player *const self, const Player *const target)
+{
+	(void)target; // because the gym leader protect themseleves
+	assert(self != NULL);
+
+	// TODO: protect if and only if the partner pokemon is stronger that the Team rocket pokeom
+
+	Action action = ACTION_PROTECT_POKEMON;
+
+	const Event event = {.action = action, .targetd_player_id = self->player_id};
+	return event;
+}
 
 static const PlayerSkills gym_leader_skills = {
-    .show_summary = gymLeaderShowSummary,
+	.show_summary = gymLeaderShowSummary,
+	.speical_ability = gymLeaderSecialAbility,
 };
 
 GymLeader *gymLeaderCreate(const int player_id)

@@ -5,23 +5,26 @@
 #include "player.h"
 #include "player_private.h"
 #include "trainer.h"
+#include "event.h"
 
 static void trainerPrintRole(const Player *const player)
 {
-    assert(player != NULL);
+	assert(player != NULL);
 
-    playerShowDefaultSummary(player);
+	playerShowDefaultSummary(player);
 	printf("\nYou are fast asleep with your partner Pokemon\n");
 }
 
-// static void trainerSpecialAbility(Trainer *const trainer)
-// {
-//     // none
-//     return;
-// }
+static Event trainerSpecialAbility(const Player *const self, const Player *const target_player)
+{
+    Event event;
+    eventSetDefault(&event);
+    return event;
+}
 
 static const PlayerSkills trainer_skills = {
-    .show_summary = trainerPrintRole,
+	.show_summary = trainerPrintRole,
+	.speical_ability = trainerSpecialAbility,
 };
 
 Trainer *trainerCreate(const int player_id)

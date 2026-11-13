@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 
+#include "event.h"
+
 typedef enum {
 	TEAM_ROCKET_GRUNT,
 	TRAINER,
@@ -24,6 +26,7 @@ typedef struct {
 
 struct PlayerSkills {
 	void (*show_summary)(const Player *const player);
+    Event (*speical_ability)(const Player *const self, const Player *const target);
 };
 
 Player *playerCreate(const int player_id, const Role role);
@@ -32,7 +35,7 @@ void playerReset(Player *player);
 
 bool playerPokemonStolen(const Player *player);
 
-bool playerIsAlive(const Player *const player);
+bool playerIsEliminated(const Player *const player);
 
 bool playerCanVote(const Player *player);
 

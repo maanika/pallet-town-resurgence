@@ -28,8 +28,12 @@ void playerInit(Player *player, const int player_id, const Role role, const Play
     player->skills = skills;
 	player->private_data = playerPrivateCreate();
 	player->private_data->pokemon_partner_stolen = false;
-	player->private_data->can_vote = true;
-	player->private_data->is_alive = true;
+	if (role == TEAM_ROCKET_GRUNT) {
+        player->private_data->can_vote = false;
+    } else {
+        player->private_data->can_vote = true;
+    }
+	player->private_data->is_elimiated = false;
 }
 
 void playerDeinit(Player *player)
@@ -42,8 +46,6 @@ void playerDeinit(Player *player)
 void playerReset(Player *player)
 {
 	assert(player != NULL);
-	player->private_data->can_vote = true;
-	player->private_data->pokemon_partner_stolen = false;
 }
 
 bool playerPokemonStolen(const Player *player)
@@ -58,9 +60,9 @@ bool playerCanVote(const Player *player)
 	return player->private_data->can_vote;
 }
 
-bool playerIsAlive(const Player *const player)
+bool playerIsEliminated(const Player *const player)
 {
-	return player->private_data->is_alive;
+	return player->private_data->is_elimiated;
 }
 
 void playerBanVote(Player *player)

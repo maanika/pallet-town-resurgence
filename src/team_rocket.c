@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "event.h"
 #include "player.h"
 #include "player_private.h"
 #include "team_rocket.h"
@@ -9,22 +10,22 @@
 
 static void teamRocketPrintRole(const Player *const player)
 {
-    assert(player != NULL);
+	assert(player != NULL);
 
 	playerShowDefaultSummary(player);
-	printf("\nYou are plotting to steal a trainer's Pokemon\n");
+	printf("\nYou are plotting to steal a trainer's Pokemon\n"
+	       "\nSelect a trainer's Pokemon to steal?\n");
 }
 
-// static void teamRocketSepcialAbility(TeamRocket *const team_rocket)
-// {
-// 	// TODO: only alive players can be selected, using 1-10 for now
-// 	const int i =
-// 		utilGetValidIntInput("Select a player's Pokemon to steal over night? ", 1, 10);
-// 	(void)i;
-// }
+static Event teamRocketSepcialAbility(const Player *const self, const Player *const target_player)
+{
+	const Event event = {.action = ACTION_STEAL_POKEMON, .targetd_player_id = target_player->player_id};
+	return event;
+}
 
 static const PlayerSkills team_rocket_skills = {
 	.show_summary = teamRocketPrintRole,
+	.speical_ability = teamRocketSepcialAbility,
 };
 
 void teamRocketPrint(TeamRocket *const team_rocket)
