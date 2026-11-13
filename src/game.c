@@ -30,16 +30,9 @@ struct Game {
 	TimeOfDay time_of_day;
 	uint8_t pokemon_protected_trainer_ids_flag;
 	uint8_t pokemon_stolen_trainer_ids_flag;
+	uint8_t voting_list[MAX_NUM_PLAYERS];
 	Player **players;
 };
-
-static void gameInitRound(Game *const game)
-{
-	assert(game != NULL);
-	game->pokemon_protected_trainer_ids_flag = 0;
-	game->pokemon_stolen_trainer_ids_flag = 0;
-	return;
-}
 
 static void gameInitPlayers(Player **players, const int num_players)
 {
@@ -135,6 +128,33 @@ static void gameHandleEvent(Game *const game, const Event event)
 	}
 }
 
+static void gameShowDayRoundResults(Game *game)
+{
+	assert(game != NULL);
+
+	int max_num_vote = -1;
+	uint8_t max_vote_id = 0;
+
+	for (uint8_t i = 0; i < game->num_players; i++) {
+		if (game->voting_list[i] > max_num_vote) {
+			max_num_vote = game->voting_list[i];
+			max_vote_id = i;
+		}
+		// If two players recive the same number of votes, flip a coin
+		if (game->voting_list[i] == max_num_vote) {
+			if (rand() % 2 == 1) {
+				max_vote_id = i;
+			}
+		}
+	}
+
+	playerEliminate(game->players[max_vote_id]);
+	const int player_id = max_vote_id + 1;
+	printf("\nThe town has decided to battle against player %d...\n\nPlayer %d has lost the battle "
+	       "and has been eliminated\n",
+	       player_id, player_id);
+}
+
 static void gameShowNightRoundResults(Game *game)
 {
 	assert(game != NULL);
@@ -142,23 +162,28 @@ static void gameShowNightRoundResults(Game *game)
 	uint8_t pokemon_stolen =
 		game->pokemon_stolen_trainer_ids_flag & ~(game->pokemon_protected_trainer_ids_flag);
 
+	printf("\n\n --- The Night has ended and the Day has begun --- \n\n");
+
 	if (pokemon_stolen == 0) {
-		printf("\nNo Pokemon were stolen tonight! :)\n");
+		printf("\nHooray!!! No Pokemon were stolen tonight! :)\n");
 		return;
 	}
 
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (pokemon_stolen & (1U << i)) {
-			printf("\nPlayer %d had their partner Pokemon stolen :(\n", i + 1);
+			printf("\nSadly player %d had their partner Pokemon stolen by Team Rocket "
+			       "and is eliminated\n",
+			       i + 1);
 			game->num_trainers_left--;
 			playerEliminate(game->players[i]);
+			break;
 		}
 	}
 
 	return;
 }
 
-static void gamePlayerTurn(Game *const game, Player *const current_player)
+static void gamePlayerNightTurn(Game *const game, Player *const current_player)
 {
 	assert(game != NULL);
 	assert(current_player != NULL);
@@ -196,6 +221,36 @@ static void gamePlayerTurn(Game *const game, Player *const current_player)
 	return;
 }
 
+static void gamePlayerVote(Game *const game, Player *const current_payer)
+{
+	assert(game != NULL);
+	assert(current_payer != NULL);
+
+	if (!playerCanVote(current_payer)) {
+		return;
+	}
+
+	uint8_t vote = 1;
+	do {
+		const int vote = utilGetValidIntInput(
+			"\nDecide which player to have a Pokemon battle with? ", 1,
+			game->num_players);
+		// canno
+		if (playerIsEliminated(game->players[vote - 1])) {
+			printf("\nThe selcted player has already had their Pokemon stoled :( and "
+			       "is eliminated form the game\n");
+			continue;
+		}
+		if (vote == (current_payer->player_id + 1)) {
+			printf("\nYou cannot battle yourself :p\n");
+			continue;
+		}
+		break;
+	} while (true);
+
+	game->voting_list[vote - 1]++;
+}
+
 static void gameNightRound(Game *const game)
 {
 	for (int i = 0; i < game->num_players; i++) {
@@ -208,18 +263,11 @@ static void gameNightRound(Game *const game)
 
 		utilPressEnterToContinue("Press ENTER when ready.");
 
-		gamePlayerTurn(game, game->players[i]);
+		gamePlayerNightTurn(game, game->players[i]);
 
 		utilPressEnterToContinue("Press ENTER to continue.");
 		utilClearScreen();
 	}
-}
-
-static void gameResetRound(Game *game)
-{
-	assert(game != NULL);
-	game->pokemon_protected_trainer_ids_flag = 0;
-	game->pokemon_stolen_trainer_ids_flag = 0;
 }
 
 static void gameDayRound(Game *const game)
@@ -231,14 +279,20 @@ static void gameDayRound(Game *const game)
 		printf("\n---------- It is Day Time! ----------\n\n");
 		printf("Player %d\n", i + 1);
 		utilPressEnterToContinue("Press ENTER when ready.");
+
+		gamePlayerVote(game, game->players[i]);
+
 		utilPressEnterToContinue("Press ENTER to continue.");
 		utilClearScreen();
 	}
 }
 
-static void gameShowDayRoundResults(Game *game)
+static void gameResetRound(Game *game)
 {
-	return;
+	assert(game != NULL);
+	game->pokemon_protected_trainer_ids_flag = 0;
+	game->pokemon_stolen_trainer_ids_flag = 0;
+	memset(game->voting_list, 0, sizeof(game->voting_list));
 }
 
 void gameStart(Game *const game)
@@ -279,7 +333,7 @@ Game *gameCreate(const int num_players)
 	game->num_trainers_left = num_players - TEAM_ROCKET_GRUNTS;
 	game->time_of_day = NIGHT_TIME;
 
-	gameInitRound(game);
+	gameResetRound(game);
 
 	game->players = gameCreatePlayers(num_players);
 
